@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wyniki wyszukiwania</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Rejestratorek.pl - SCM</h2>
+            <a href="{% url 'sprawdz_formularz' %}">Strona główna</a>
+            <a href="{% url 'realizacje_lista' %}">Realizacje</a>
+        </div>
+
+        <div class="content">
+            <h1>Wyniki dla: {{ numer }}</h1>
+
+            <a href="{% url 'sprawdz_formularz' %}?q={{ clean_prefix }}" class="button">
+                Pokaż rejestratorów z "{{ clean_prefix }}"
+            </a>
+
+            {% if realizacje %}
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Firma</th>
+                            <th>Czynność</th>
+                            <th>Data dodania</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in realizacje %}
+                        <tr>
+                            <td>{{ r.firma }}</td>
+                            <td>{{ r.czynnosc }}</td>
+                            <td>{{ r.data_dodania|date:"d-m-Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p>Brak realizacji dla podanego numeru rejestracyjnego.</p>
+            {% endif %}
+
+            <a href="{% url 'sprawdz_formularz' %}" class="back-button">🔙 Wróć</a>
+        </div>
+    </div>
+</body>
+</html>

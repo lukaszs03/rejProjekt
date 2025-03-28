@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprawdź rejestrację</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Rejestratorek.pl - SCM</h2>
+            <a href="{% url 'sprawdz_formularz' %}">Strona główna</a>
+            <a href="{% url 'realizacje_lista' %}">Realizacje</a>
+        </div>
+
+        <div class="content">
+            <h1>Wpisz numer rejestracyjny</h1>
+            <form method="post" class="search-bar">
+                {% csrf_token %}
+                <input type="text" name="numer_rejestracyjny" placeholder="Np. ABC123" required>
+                <button type="submit" class="button-search">Szukaj</button>
+            </form>
+
+            <h2>Lista rejestratorów</h2>
+
+            <form method="get" class="filter-form">
+                <input type="text" name="q" placeholder="Filtruj po rejestracji (np. DW)" value="{{ query }}">
+                <button type="submit">Filtruj</button>
+            </form>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Numer rej</th>
+                            <th>Nazwa firmy</th>
+                            <th>Imię i nazwisko</th>
+                            <th>Email</th>
+                            <th>Telefon</th>
+                            <th>Adres</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in rejestratorzy %}
+                        <tr>
+                            <td>{{ r.numer_rejestracyjny }}</td>
+                            <td>{{ r.nazwa_firmy }}</td>
+                            <td>{{ r.imie_nazwisko }}</td>
+                            <td>{{ r.email }}</td>
+                            <td>{{ r.telefon }}</td>
+                            <td>{{ r.adres }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4">Brak danych</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                {% if rejestratorzy.has_previous %}
+                    <a href="?q={{ query }}&page=1">⏮️ Pierwsza</a>
+                    <a href="?q={{ query }}&page={{ rejestratorzy.previous_page_number }}">⬅️ Poprzednia</a>
+                {% endif %}
+
+                <span>Strona {{ rejestratorzy.number }} z {{ rejestratorzy.paginator.num_pages }}</span>
+
+                {% if rejestratorzy.has_next %}
+                    <a href="?q={{ query }}&page={{ rejestratorzy.next_page_number }}">Następna ➡️</a>
+                    <a href="?q={{ query }}&page={{ rejestratorzy.paginator.num_pages }}">Ostatnia ⏭️</a>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
