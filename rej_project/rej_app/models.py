@@ -9,7 +9,10 @@ class Rejestrator(models.Model):
     adres = models.CharField(max_length=300)
 
     def __str__(self):
-        return f"{self.rejestrator} - {self.numer_rejestracyjny}"
+        return self.rejestrator
+
+class Meta:
+    unique_together = ['numer_rejestracyjny', 'rejestrator']
 
 
 class Realizacja(models.Model):
@@ -21,4 +24,4 @@ class Realizacja(models.Model):
     data_dodania = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.rejestrator.rejestrator} - {self.numer_rejestracyjny}"
+        return self.numer_rejestracyjny
