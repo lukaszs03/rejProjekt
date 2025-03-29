@@ -27,7 +27,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Firma</th>
+                            <th>Rejestrator</th>
                             <th>Czynność</th>
                             <th>Data dodania</th>
                         </tr>
@@ -35,9 +35,9 @@
                     <tbody>
                         {% for r in realizacje %}
                         <tr>
-                            <td>{{ r.firma }}</td>
-                            <td>{{ r.czynnosc }}</td>
-                            <td>{{ r.data_dodania|date:"d-m-Y H:i" }}</td>
+                            <td>{{ r.rejestrator }}</td>
+                            <td>{{ r.rodzaj_sprawy }}</td>
+                            <td>{{ r.data_dodania|date:"d-m-Y" }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
