@@ -2,20 +2,23 @@ from django.db import models
 
 class Rejestrator(models.Model):
     numer_rejestracyjny = models.CharField(max_length=10)
-    nazwa_firmy = models.CharField(max_length=100)
-    imie_nazwisko = models.CharField(max_length=100)
+    rejestrator = models.CharField(max_length=100)
+    osoba_kontaktowa = models.CharField(max_length=100)
     email = models.EmailField()
     telefon = models.CharField(max_length=20)
     adres = models.CharField(max_length=300)
 
     def __str__(self):
-        return f"{self.nazwa_firmy} - {self.imie_nazwisko}"
+        return f"{self.rejestrator} - {self.numer_rejestracyjny}"
+
 
 class Realizacja(models.Model):
-    firma = models.ForeignKey(Rejestrator, on_delete=models.CASCADE) 
+    rejestrator = models.ForeignKey(Rejestrator, on_delete=models.CASCADE, null=True)
     numer_rejestracyjny = models.CharField(max_length=20)
-    czynnosc = models.TextField()
+    numer_umowy = models.CharField(max_length=50)
+    rodzaj_sprawy = models.CharField(max_length=100)
+    grupa_spraw = models.CharField(max_length=10)
     data_dodania = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.firma.nazwa_firmy} - {self.numer_rejestracyjny}"
+        return f"{self.rejestrator.rejestrator} - {self.numer_rejestracyjny}"

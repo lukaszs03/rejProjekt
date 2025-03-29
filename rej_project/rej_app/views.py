@@ -5,7 +5,7 @@ from django.core.paginator import Paginator
 
 def sprawdz_formularz(request):
     query = request.GET.get("q", "").upper()
-    rejestratorzy = Rejestrator.objects.all()
+    rejestratorzy = Rejestrator.objects.all().order_by("numer_rejestracyjny")
 
     if query:
         rejestratorzy = rejestratorzy.filter(numer_rejestracyjny__startswith=query)
@@ -44,7 +44,7 @@ def sprawdz_wynik(request, numer):
 def realizacje_lista(request):
     filter_value = request.GET.get("filter", "").upper()
     
-    realizacje = Realizacja.objects.all()
+    realizacje = Realizacja.objects.all().order_by("numer_rejestracyjny")
     if filter_value:
         realizacje = realizacje.filter(numer_rejestracyjny__startswith=filter_value)
 

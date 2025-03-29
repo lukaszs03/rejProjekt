@@ -34,9 +34,9 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Numer rej</th>
+                            <th>Nr rej</th>
                             <th>Nazwa firmy</th>
-                            <th>Imię i nazwisko</th>
+                            <th>Osoba kontaktowa</th>
                             <th>Email</th>
                             <th>Telefon</th>
                             <th>Adres</th>
@@ -46,8 +46,8 @@
                         {% for r in rejestratorzy %}
                         <tr>
                             <td>{{ r.numer_rejestracyjny }}</td>
-                            <td>{{ r.nazwa_firmy }}</td>
-                            <td>{{ r.imie_nazwisko }}</td>
+                            <td>{{ r.rejestrator }}</td>
+                            <td>{{ r.osoba_kontaktowa }}</td>
                             <td>{{ r.email }}</td>
                             <td>{{ r.telefon }}</td>
                             <td>{{ r.adres }}</td>
