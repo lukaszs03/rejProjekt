@@ -117,7 +117,7 @@ Serwer wystartował zgodnie z ustawieniami na 127.0.0.1 oraz porcie 8000.<br>
 
 Gotowe :)
 
-PS. Całość, o ile miałaby stać kiedyś na produkcji można w przyszłości uprościć stawiając apke na produkcji przy użycji np. Nginx, Gunicorn.
+PS. Całość, o ile miałaby stać kiedyś na produkcji można w przyszłości uprościć stawiając apke na produkcji przy użyciu np. Nginx, Gunicorn.
 
 ### Windows/MacOS
 
