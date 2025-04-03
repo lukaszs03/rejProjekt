@@ -113,7 +113,7 @@ Serwer wystartował zgodnie z ustawieniami na 127.0.0.1 oraz porcie 8000.<br>
 > Aby zmienić te ustawienia, przejdź do pliku settings.py (folder ```rej_project/rej_project```).<br>
 > W zmiennej ```ALLOWED_HOSTS = [127.0.0.1]``` wpisz adres, na którym chcesz uruchomić projekt - domenę lub numeryczny (**bez portu!**).<br>
 > Jeśli chcesz zmienić port to przy starcie ```python3 manage.py runserver``` dopisz port (dla przykładu użyję ```8080```):<br>
-> ```python3 manage.py runserver 8080```
+> ```python3 manage.py runserver 8080```<br>
 > Pelna komenda do uruchomienia po dokonaniu zmian:<br>
 > ```python3 manage.py runserver IP:PORT```
 
