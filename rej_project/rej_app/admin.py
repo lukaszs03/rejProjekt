@@ -13,7 +13,7 @@ class ImportExcelForm(forms.Form):
 @admin.register(Rejestrator)
 class RejestratorAdmin(admin.ModelAdmin):
     list_display = ('numer_rejestracyjny', 'rejestrator', 'miasto', 'email', 'telefon')
-    change_list_template = 'admin/rej_app/rejestrator/change_list.html'  # Ważne!
+    change_list_template = 'admin/rej_app/rejestrator/change_list.html'
     
     def get_urls(self):
         urls = super().get_urls()
