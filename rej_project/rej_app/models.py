@@ -1,11 +1,11 @@
 from django.db import models
 
 class Rejestrator(models.Model):
-    numer_rejestracyjny = models.CharField(max_length=10)
+    numer_rejestracyjny = models.CharField(max_length=20)
     rejestrator = models.CharField(max_length=100)
     osoba_kontaktowa = models.CharField(max_length=100)
     email = models.EmailField()
-    telefon = models.CharField(max_length=20)
+    telefon = models.CharField(max_length=100)
     adres = models.CharField(max_length=300)
 
     def __str__(self):
