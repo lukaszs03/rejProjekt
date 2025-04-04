@@ -119,8 +119,6 @@ Serwer wystartował zgodnie z ustawieniami na 127.0.0.1 oraz porcie 8000.<br>
 
 Gotowe :)
 
-PS. Całość, o ile miałaby stać kiedyś na produkcji można w przyszłości uprościć stawiając apke na produkcji przy użyciu np. Nginx, Gunicorn.
-
 ### Windows/MacOS
 
 Windows oraz MacOS mają gotowe ```venv```, przy instalacji Pythona ```pip``` i ```venv``` instalują się automatycznie.
@@ -136,3 +134,21 @@ Wpisz komendę:
 ```pip install -r requirements.txt```
 
 Przejdź do ```rej_project```, a następnie wpisz ```py manage.py runserver```.
+
+## Konfiguracja gunicorn + myapp.service
+Do poprawnego działania myapp.service (aby Django obsługiwało >1 request) zainstaluj gunicorn wewnątrz ```venv_linux```:<br>
+```pip install gunicorn```<br>
+
+Pobierz plik myapp.service, skonfiguruj w nim (niektóre wartości w pliku są już ustawione, zweryfikuj czy ścieżka u Ciebie jest poprawna): 
+-```User```,<br>
+-```Group``` (domyślnie www-data),<br>
+-```WorkingDirectory``` - wskaż ścieżkę do projektu,<br>
+-```Environment``` - wskaż ścieżkę do venv/bin,<br>
+-```ExecStart``` - wskaż ścieżkę do gunicorn (po /bin/) oraz wprowadź komendę ```/twoja_sciezka/uzytkownik/rejProjekt/venv/bin/gunicorn --workers 3 --bind IP:PORT rej_project.wsgi:application```,<br>
+-```Restart```.<br>
+> [!IMPORTANT]  
+> Plik musi znajdować się w ```/etc/systemd/system/myapp.service```<br>
+> Wymuś wykrycie pliku - ```sudo systemctl daemon-reload```<br>
+> Uruchom - ```sudo systemctl start myapp```<br>
+> Autostart (opcjonalne) - ```sudo systemctl enable myapp```<br>
+> Weryfikacja statusu - ```sudo systemctl status myapp```<br>
