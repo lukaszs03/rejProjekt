@@ -12,15 +12,15 @@ class ImportExcelForm(forms.Form):
 
 @admin.register(Rejestrator)
 class RejestratorAdmin(admin.ModelAdmin):
-    list_display = ('numer_rejestracyjny', 'rejestrator', 'osoba_kontaktowa', 'email', 'telefon')
-    change_list_template = 'admin/rej_app/rejestrator/change_list.html'
+    list_display = ('numer_rejestracyjny', 'rejestrator', 'miasto', 'email', 'telefon')
+    change_list_template = 'admin/rej_app/rejestrator/change_list.html'  # Ważne!
     
     def get_urls(self):
         urls = super().get_urls()
-        my_urls = [
-            path('import-excel/', self.import_excel),
+        custom_urls = [
+            path('import-excel/', self.import_excel, name='import_excel'),
         ]
-        return my_urls + urls
+        return custom_urls + urls
     
     def import_excel(self, request):
         if request.method == 'POST':
@@ -29,28 +29,32 @@ class RejestratorAdmin(admin.ModelAdmin):
                 try:
                     df = pd.read_excel(request.FILES['excel_file'])
                     for index, row in df.iterrows():
-                        Rejestrator.objects.update_or_create(
-                            numer_rejestracyjny=row['Numer Rejestracyjny'],
-                            rejestrator=row['Rejestrator'],
-                            defaults={
-                                'osoba_kontaktowa': row['Osoba do kontaktu'],
-                                'email': row['email'],
-                                'telefon': row['telefon'],
-                                'adres': row['adres'],
-                            }
-                        )
+                        nazwa_rejestratora = row['Rejestrator']
+                        numery_rej = str(row['Numer Rejestracyjny']).strip()
+                        
+                        for numer in [p.strip().upper() for p in numery_rej.split(',') if p.strip()]:
+                            prefix = ''.join([c for c in numer if c.isalpha()])[:3]
+                            prefix = prefix or 'UNK'
+                            
+                            Rejestrator.objects.update_or_create(
+                                numer_rejestracyjny=prefix,
+                                rejestrator=nazwa_rejestratora,
+                                defaults={
+                                    'miasto': row.get('Miasto', ''),
+                                    'email': row.get('email', ''),
+                                    'telefon': row.get('telefon', ''),
+                                    'adres': row.get('adres', '')
+                                }
+                            )
+                    
                     self.message_user(request, "Dane zaimportowane pomyślnie!")
-                    return HttpResponseRedirect('..')
+                    return HttpResponseRedirect("../")
                 except Exception as e:
                     self.message_user(request, f"Błąd: {str(e)}", level=messages.ERROR)
         else:
             form = ImportExcelForm()
         
-        context = {
-            'form': form,
-            'opts': self.model._meta,
-        }
-        return render(request, 'admin/import_excel.html', context)
+        return render(request, 'admin/import_excel.html', {'form': form})
 
 @admin.register(Realizacja)
 class RealizacjaAdmin(admin.ModelAdmin):
@@ -70,68 +74,68 @@ class RealizacjaAdmin(admin.ModelAdmin):
         return my_urls + urls
     
     def import_excel(self, request):
+        def extract_prefix(numer_rej):
+            numer_str = str(numer_rej).upper().strip()
+            prefix = []
+            for char in numer_str:
+                if char.isalpha():
+                    prefix.append(char)
+                else:
+                    break
+            return ''.join(prefix) or 'UNK'
+
         if request.method == 'POST':
             form = ImportExcelForm(request.POST, request.FILES)
             if form.is_valid():
                 try:
                     df = pd.read_excel(request.FILES['excel_file'])
+                    new_records = 0
+                    updated_records = 0
+                    
                     for index, row in df.iterrows():
-                        numer_rej = row['Numer Rejestracyjny']
-                        nazwa_rejestratora = row['Rejestrator']
-
-                        prefix_rej = ''.join(filter(str.isalpha, str(numer_rej))).upper()
-
-                        try:
-                            rejestrator = Rejestrator.objects.get(
-                                numer_rejestracyjny=prefix_rej,
-                                rejestrator=nazwa_rejestratora
-                            )
-
-                            if not rejestrator.osoba_kontaktowa or rejestrator.osoba_kontaktowa == 'Do uzupełnienia':
-                                rejestrator.osoba_kontaktowa = row.get('Osoba do kontaktu', 'Do uzupełnienia')
-                            if not rejestrator.email or rejestrator.email == 'brak@example.com':
-                                rejestrator.email = row.get('email', 'brak@example.com')
-                            if not rejestrator.telefon or rejestrator.telefon == '000000000':
-                                rejestrator.telefon = row.get('telefon', '000000000')
-                            if not rejestrator.adres or rejestrator.adres == 'Do uzupełnienia':
-                                rejestrator.adres = row.get('adres', 'Do uzupełnienia')
-                            rejestrator.save()
-                            
-                        except Rejestrator.DoesNotExist:
-                            rejestrator = Rejestrator.objects.create(
-                                numer_rejestracyjny=prefix_rej,
-                                rejestrator=nazwa_rejestratora,
-                                osoba_kontaktowa=row.get('Osoba do kontaktu', 'Do uzupełnienia'),
-                                email=row.get('email', 'brak@example.com'),
-                                telefon=row.get('telefon', '000000000'),
-                                adres=row.get('adres', 'Do uzupełnienia'),
-                            )
-                            self.message_user(
-                                request, 
-                                f"Utworzono nowego rejestratora: {prefix_rej} {rejestrator.rejestrator}", 
-                                level=messages.INFO
-                            )
-
-                        Realizacja.objects.update_or_create(
-                            numer_rejestracyjny=numer_rej,
+                        numer_rej = str(row['Numer Rejestracyjny']).strip()
+                        prefix = extract_prefix(numer_rej)
+                        rodzaj_sprawy = row.get('rodzaj sprawy', '') 
+                        
+                        rejestrator, created = Rejestrator.objects.get_or_create(
+                            numer_rejestracyjny=prefix,
+                            rejestrator=row['Rejestrator'],
                             defaults={
-                                'rejestrator': rejestrator,
-                                'numer_umowy': row['numer umowy'],
-                                'rodzaj_sprawy': row['rodzaj sprawy'],
-                                'grupa_spraw': row['grupy spraw'],
+                                'miasto': row.get('miasto', ''),
+                                'email': row.get('email', ''),
+                                'telefon': row.get('telefon', ''),
+                                'adres': row.get('adres', '')
                             }
                         )
+
+                        if not Realizacja.objects.filter(
+                            numer_rejestracyjny=numer_rej,
+                            rejestrator=rejestrator,
+                            rodzaj_sprawy=row.get('rodzaj sprawy', '')
+                        ).exists():
+                            
+                            Realizacja.objects.create(
+                                numer_rejestracyjny=numer_rej,
+                                rejestrator=rejestrator,
+                                numer_umowy=row.get('numer umowy', ''),
+                                rodzaj_sprawy=row.get('rodzaj sprawy', ''),
+                                grupa_spraw=row.get('grupy spraw', ''),
+                            )
+                            new_records += 1
+                        else:
+                            updated_records += 1
                     
-                    self.message_user(request, "Dane zostały zaimportowane pomyślnie")
+                    self.message_user(
+                        request,
+                        f"Zakończono import: {new_records} nowych wpisów, {updated_records} pominiętych duplikatów",
+                        level=messages.SUCCESS
+                    )
                     return HttpResponseRedirect('..')
                     
                 except Exception as e:
-                    self.message_user(request, f"Błąd podczas importu: {str(e)}", level=messages.ERROR)
+                    self.message_user(request, f"Błąd: {str(e)}", level=messages.ERROR)
         else:
             form = ImportExcelForm()
         
-        context = {
-            'form': form,
-            'opts': self.model._meta,
-        }
+        context = {'form': form, 'opts': self.model._meta}
         return render(request, 'admin/import_excel.html', context)

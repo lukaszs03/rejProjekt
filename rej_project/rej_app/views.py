@@ -4,11 +4,21 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 
 def sprawdz_formularz(request):
-    query = request.GET.get("q", "").upper()
+    nr_query = request.GET.get("q", "").upper().strip()
+    miasto_query = request.GET.get("city", "").strip().title()
+    
     rejestratorzy = Rejestrator.objects.all().order_by("numer_rejestracyjny")
 
-    if query:
-        rejestratorzy = rejestratorzy.filter(numer_rejestracyjny__startswith=query)
+    if nr_query or miasto_query:
+        filters = Q()
+        if nr_query:
+            filters &= Q(numer_rejestracyjny__startswith=nr_query)
+        if miasto_query:
+            filters &= (
+                Q(miasto__iexact=miasto_query) |
+                Q(adres__icontains=miasto_query)
+            )
+        rejestratorzy = rejestratorzy.filter(filters)
 
     paginator = Paginator(rejestratorzy, 10)
     page_number = request.GET.get("page")
@@ -19,8 +29,13 @@ def sprawdz_formularz(request):
         return redirect("sprawdz_wynik", numer=numer)
 
     return render(
-        request, "formularz.html",
-        {"rejestratorzy": rejestratorzy_page, "query": query}
+        request,
+        "formularz.html",
+        {
+            "rejestratorzy": rejestratorzy_page,
+            "query": nr_query,
+            "miasto_query": miasto_query,
+        }
     )
 
 

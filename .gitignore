@@ -2,3 +2,4 @@ rej_project/.env
 venv
 venv_mac
 rej_project/rej_app/__pycache__
+/testowe_pliki

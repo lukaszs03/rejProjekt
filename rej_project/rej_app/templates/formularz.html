@@ -26,7 +26,8 @@
             <h2>Lista rejestratorów</h2>
 
             <form method="get" class="filter-form">
-                <input type="text" name="q" placeholder="Filtruj po rejestracji (np. DW)" value="{{ query }}">
+                <input type="text" name="q" placeholder="Numer rejestracyjny (np. DW)" value="{{ request.GET.q }}">
+                <input type="text" name="city" placeholder="Miasto" value="{{ request.GET.city }}">
                 <button type="submit">Filtruj</button>
             </form>
 
@@ -36,7 +37,7 @@
                         <tr>
                             <th>Nr rej</th>
                             <th>Nazwa firmy</th>
-                            <th>Osoba kontaktowa</th>
+                            <th>Miasto</th>
                             <th>Email</th>
                             <th>Telefon</th>
                             <th>Adres</th>
@@ -47,7 +48,7 @@
                         <tr>
                             <td>{{ r.numer_rejestracyjny }}</td>
                             <td>{{ r.rejestrator }}</td>
-                            <td>{{ r.osoba_kontaktowa }}</td>
+                            <td>{{ r.miasto }}</td>
                             <td>{{ r.email }}</td>
                             <td>{{ r.telefon }}</td>
                             <td>{{ r.adres }}</td>
